@@ -1,0 +1,138 @@
+// Tutti i testi del gioco (italiano).
+export const S = {
+  title: 'Sorrisi in Corsia',
+  subtitle: 'Un volontario, un reparto di pediatria e tanti palloncini.',
+  play: 'Gioca',
+  howTo: 'Come si gioca',
+  back: 'Indietro',
+  close: 'Chiudi',
+  resume: 'Torna in corsia',
+  chooseCharacter: 'Scegli il tuo volontario',
+  start: 'Entra in reparto',
+  comingSoon: 'Prossimamente',
+  superpowerLabel: 'Superpotere',
+  characters: {
+    lorenzo: {
+      name: 'Lorenzo',
+      power: 'Calisthenics',
+      description: 'Verticali, planche e bandiere umane in mezzo al reparto: i bambini restano a bocca aperta e la loro felicità sale il doppio.',
+    },
+  },
+
+  help: [
+    'Tocca o clicca il pavimento per camminare.',
+    'Tocca un bambino: il volontario lo raggiunge e puoi scegliere cosa fare.',
+    'Palloncino: modella una figura. A volte scoppia: qualcuno si spaventa, qualcuno ride!',
+    'Sala giochi: tocca lo scaffale per prendere un gioco, poi portalo a un bambino. Il suo preferito vale di più.',
+    'Vieni a giocare: il bambino ti segue. Portalo in sala giochi e premi "Giocate insieme".',
+    'Superpotere: acrobazie di calisthenics. Tutti i bambini nella stanza ricevono il doppio della felicità.',
+    'La barra sopra la testa va dal rosso (triste) al verde (felice).',
+  ],
+  helpControls:
+    'Trascina per spostare la visuale, usa la rotella o due dita per lo zoom. Tasti: 1 palloncino, 2 gioco, 3 invito, 4 o Spazio superpotere, C centra, M audio.',
+
+  actions: {
+    balloon: 'Palloncino',
+    toy: 'Dai il gioco',
+    toyNone: 'Prendi un gioco',
+    invite: 'Vieni a giocare',
+    sendBack: 'Torna a letto',
+    playTogether: 'Giocate insieme',
+    super: 'Superpotere',
+    center: 'Centra',
+    sound: 'Audio',
+    help: 'Aiuto',
+  },
+
+  hud: {
+    average: 'Allegria del reparto',
+    smiles: 'Sorrisi regalati',
+    balloons: 'Palloncini',
+    popped: 'scoppiati',
+    carrying: 'In mano',
+    nothing: 'Niente',
+    followers: 'Ti seguono',
+    favourite: 'Gioco preferito',
+    bedridden: 'Non può alzarsi',
+    canWalk: 'Può alzarsi',
+    mood: ['Triste', 'Così così', 'Contento', 'Felicissimo'],
+    ready: 'Pronto',
+  },
+
+  shelf: {
+    title: 'Scaffale dei giochi',
+    hint: 'Scegli un gioco da portare in corsia.',
+    taken: 'In uso',
+    holding: 'Lo hai in mano',
+    putBack: 'Rimetti a posto',
+  },
+
+  rooms: {
+    giungla: 'Stanza Giungla',
+    spazio: 'Stanza Spazio',
+    mare: 'Stanza Mare',
+    fiori: 'Stanza Fiori',
+    giochi: 'Sala Giochi',
+    corridoio: 'Corridoio',
+  },
+
+  toys: {
+    peluche: 'Orsacchiotto',
+    libro: 'Libro di fiabe',
+    costruzioni: 'Costruzioni',
+    pennarelli: 'Pennarelli',
+    marionetta: 'Marionetta',
+    macchinina: 'Macchinina',
+  },
+
+  balloons: {
+    cane: 'Un cagnolino!',
+    spada: 'Una spada!',
+    fiore: 'Un fiore!',
+    giraffa: 'Una giraffa!',
+    cuore: 'Un cuore!',
+  },
+
+  superMoves: {
+    verticale: 'Verticale!',
+    planche: 'Planche!',
+    lsit: 'L-sit!',
+    bandiera: 'Bandiera umana!',
+  },
+
+  say: {
+    greet: ['Ciao!', 'Giochiamo?', 'Mi annoio...', 'Chi sei?', 'Che bello vederti!'],
+    balloonStart: ['Guarda qui...', 'Un attimo...', 'Magia in arrivo!'],
+    happy: ['Wow!', 'Che bello!', 'Grazie!', 'Ancora!', 'Evviva!'],
+    pop: 'BUM!',
+    popUpset: ['Aah!', 'Che paura!', 'Uffa...', 'Noo!'],
+    popAmused: ['Ahahah!', 'Che botto!', 'Rifallo!', 'Hihihi!'],
+    superKid: ['Fortissimo!', 'Incredibile!', 'Come fai?!', 'Ahahah!', 'Sei un supereroe!'],
+    toy: ['Giochiamo!', 'Grazie!', 'Che divertente!'],
+    toyFavourite: ['Il mio preferito!', 'Proprio quello che volevo!'],
+    alreadyPlaying: 'Sto già giocando!',
+    accept: ['Sì, andiamo!', 'Arrivo!', 'Che bello!'],
+    bedridden: 'Non posso alzarmi... mi porti un gioco?',
+    waiting: 'Andiamo in sala giochi!',
+    playing: ['Tocca a me!', 'Che divertente!', 'Ancora una volta!', 'Ahahah!'],
+    goingBack: 'Torno a letto. Ciao!',
+    doctor: ['Come va oggi?', 'Tutto bene qui.', 'Ancora un controllo.', 'Bravissimi!'],
+    nurse: ['È ora della merenda.', 'Controllo la flebo.', 'Che bei sorrisi!', 'Torno subito.'],
+    parent: ['Grazie di cuore.', 'Finalmente ride!', 'Serve un caffè...', 'Siete preziosi.'],
+    reception: ['Benvenuto in reparto!', 'La sala giochi è a destra.', 'Buon lavoro!'],
+  },
+
+  toast: {
+    noAudience: 'Qui non ci sono bambini a guardare: nessuna ricarica consumata.',
+    superRecharging: 'Il superpotere si sta ricaricando.',
+    needToy: 'Prima prendi un gioco dallo scaffale in sala giochi.',
+    tooMany: 'Hai già un bel gruppo al seguito!',
+    noKidNear: 'Nessun bambino qui vicino: toccane uno.',
+    tookToy: (toy) => `Hai preso: ${toy}`,
+    putToy: 'Gioco rimesso sullo scaffale.',
+    toyReturned: (toy) => `${toy} è tornato sullo scaffale.`,
+    goToPlayroom: 'Raggiungi la sala giochi insieme.',
+    readyToPlay: 'Siete in sala giochi: premi "Giocate insieme".',
+    superArea: (n) => `Tutti ammirati! Doppia felicità per ${n === 1 ? '1 bambino' : `${n} bambini`}.`,
+  },
+};

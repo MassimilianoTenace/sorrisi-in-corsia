@@ -1,0 +1,5 @@
+# Foto reali usate solo come riferimento per i disegni: non vanno pubblicate.
+assets/character_images/
+
+node_modules/
+.DS_Store

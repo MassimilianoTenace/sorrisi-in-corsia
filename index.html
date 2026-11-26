@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Sorrisi in Corsia</title>
+  <meta name="description" content="Gioco nel browser: un volontario in pediatria porta allegria con palloncini, giochi e acrobazie.">
+  <meta name="theme-color" content="#2f5646">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><ellipse cx='16' cy='13' rx='10' ry='12' fill='%23ef4b4b' stroke='%232b1c18' stroke-width='1.5'/><path d='M13 28l3-4 3 4z' fill='%23ef4b4b' stroke='%232b1c18'/></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="game" aria-label="Reparto di pediatria"></canvas>
+  <div id="room" class="room-label"></div>
+  <div id="toasts" role="status" aria-live="polite"></div>
+  <div id="action-menu" hidden></div>
+  <footer id="hud"></footer>
+  <div id="screens" hidden></div>
+  <noscript><p style="padding:2rem;color:#fff">Per giocare serve JavaScript.</p></noscript>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
