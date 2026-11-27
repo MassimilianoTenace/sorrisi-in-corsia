@@ -15,11 +15,14 @@ import vincenzo from './vincenzo.js';
 import emmanuele from './emmanuele.js';
 import mimmo from './mimmo.js';
 import anna from './anna.js';
+import martina from './martina.js';
+import ida from './ida.js';
 
 export const CHARACTERS = [
   lorenzo, gianni, caterina, mariapa, marina,
   sabrina, mariafrancesca, benedetta, giovanna, gabriella,
   max, vincenzo, emmanuele, mimmo, anna,
+  martina, ida,
 ];
 
 export const getCharacter = (id) => CHARACTERS.find((c) => c.id === id) ?? CHARACTERS[0];

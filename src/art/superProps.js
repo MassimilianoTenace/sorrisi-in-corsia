@@ -4,7 +4,7 @@
 import { INK, shade, poly, ellipse, rrect, line, star, heart, finish } from './primitives.js';
 import { drawPump, drawGuitar, drawNote, drawBacon, drawBrick, drawWeb, BALLOON_COLORS } from './props.js';
 import { P } from './skeleton.js';
-import { VANISH } from './superPoses.js';
+import { VANISH, HAT, LESSON } from './superPoses.js';
 
 const GOLD = '#f6c531';
 
@@ -113,6 +113,168 @@ function webLine(ctx, from, to, k) {
   line(ctx, [from, end], '#ffffff', 1.4);
   if (k >= 1) drawWeb(ctx, end.x, end.y, 11);
 }
+
+// Cilindro nero con nastro rosso. L'origine è al centro della tesa; con "open" la bocca è in su.
+const HAT_BRIM = { x: 13, y: 4.2 };
+
+function topHatBody(ctx, open) {
+  const dir = open ? 1 : -1;
+  const end = dir * 18;
+  poly(ctx, [P(-8.5, 0), P(-9.5, end), P(9.5, end), P(8.5, 0)], '#26222f');
+  ellipse(ctx, 0, end, 9.5, 3, open ? '#26222f' : '#3b3548');
+  poly(ctx, [P(-8.8, dir * 4), P(-9, dir * 8.5), P(9, dir * 8.5), P(8.8, dir * 4)], '#d8323c', INK, 0.8);
+  line(ctx, [P(-5.5, dir * 10), P(-6, dir * 15)], 'rgba(255,255,255,0.35)', 1.6);
+}
+
+// Metà anteriore della tesa: ridisegnata dopo il coniglio, che così sta dentro il cappello.
+function brimFront(ctx) {
+  ctx.beginPath();
+  ctx.ellipse(0, 0, HAT_BRIM.x, HAT_BRIM.y, 0, 0, Math.PI);
+  ctx.ellipse(0, 0, 8.5, 2.4, 0, Math.PI, 0, true);
+  ctx.closePath();
+  finish(ctx, '#26222f', INK, 1);
+}
+
+// Coniglietto bianco; l'origine è alla base del busto. "wiggle" muove le orecchie.
+function rabbit(ctx, wiggle) {
+  for (const [dir, bend] of [[-1, wiggle], [1, -wiggle * 0.6]]) {
+    const angle = dir * 0.22 + bend;
+    const x = dir * 4 + Math.sin(angle) * 8;
+    ellipse(ctx, x, -22, 2.9, 8.5, '#ffffff', INK, 1, angle);
+    ellipse(ctx, x, -21.5, 1.2, 5.5, '#f7a9bd', null, 1, angle);
+  }
+  ellipse(ctx, 0, -2, 6.5, 7, '#ffffff', INK, 1);
+  ellipse(ctx, 0, -11, 7.5, 6.8, '#ffffff', INK, 1);
+  for (const x of [-2.8, 2.8]) {
+    ellipse(ctx, x, -12.2, 1.2, 1.5, INK, null);
+    ellipse(ctx, x + 0.4, -12.7, 0.4, 0.4, '#ffffff', null);
+    line(ctx, [P(x * 0.8, -8.6), P(x * 3.2, -9.6)], '#8d8478', 0.5);
+    line(ctx, [P(x * 0.8, -8), P(x * 3.2, -7.2)], '#8d8478', 0.5);
+    ellipse(ctx, x * 1.6, -9.4, 1.5, 1, 'rgba(235, 90, 120, 0.4)', null);
+  }
+  ellipse(ctx, 0, -9.2, 1.4, 1, '#e8708a', INK, 0.5);
+  for (const x of [-5.5, 5.5]) ellipse(ctx, x, -0.5, 2.6, 2.1, '#ffffff', INK, 0.9);
+}
+
+const magicHat = {
+  over(ctx, j, { t, p }, parts) {
+    if (p < HAT.show) return;
+    parts.add('topHat');
+    const open = p >= HAT.flip;
+    const hat = open ? P(j.b.ha.x + 8, j.b.ha.y - 13) : P(j.b.ha.x + 5, j.b.ha.y - 2);
+    const rise = open ? Math.min(1, Math.max(0, (p - HAT.rabbit) / 0.1)) : 0;
+    ctx.save();
+    ctx.translate(hat.x, hat.y);
+    topHatBody(ctx, open);
+    ellipse(ctx, 0, 0, HAT_BRIM.x, HAT_BRIM.y, '#26222f', INK, 1);
+    if (open) {
+      ellipse(ctx, 0, 0, 8.5, 2.4, '#0d0a12', INK, 0.8);
+      if (rise > 0) {
+        parts.add('rabbit');
+        ctx.save();
+        // visibile solo sopra il bordo della bocca
+        ctx.beginPath();
+        ctx.moveTo(-30, -60);
+        ctx.lineTo(30, -60);
+        ctx.lineTo(30, 0);
+        ctx.lineTo(8.5, 0);
+        ctx.ellipse(0, 0, 8.5, 2.4, 0, 0, Math.PI);
+        ctx.lineTo(-30, 0);
+        ctx.closePath();
+        ctx.clip();
+        const hop = rise >= 1 ? Math.abs(Math.sin(t * 5)) * 2.5 : 0;
+        ctx.translate(0, 28 * (1 - rise) - hop);
+        rabbit(ctx, Math.sin(t * 7) * 0.16);
+        ctx.restore();
+      }
+      brimFront(ctx);
+    }
+    ctx.restore();
+
+    if (p >= HAT.flip) {
+      const angle = p < HAT.rabbit ? -0.05 + Math.sin(t * 11) * 0.12 : -1.9;
+      const tip = wand(ctx, j.a.ha, angle);
+      parts.add('wand');
+      star(ctx, tip.x, tip.y, 3, '#ffe45c', INK);
+    }
+    if (p >= HAT.rabbit) {
+      const k = (p - HAT.rabbit) / 0.14;
+      if (k < 1) {
+        for (let i = 0; i < 6; i++) {
+          const a = Math.PI + (i / 5) * Math.PI;
+          ellipse(ctx, hat.x + Math.cos(a) * (8 + k * 20), hat.y + Math.sin(a) * (4 + k * 20), 5 * (1 - k) + 1, 5 * (1 - k) + 1, '#ffffff', '#b9b4cc', 0.8);
+        }
+      }
+      sparkles(ctx, hat.x, hat.y - 14, 28, t, k < 1 ? 8 : 5);
+    }
+  },
+};
+
+// Lavagna su cavalletto, a destra di chi spiega. Le scritte compaiono da sinistra a destra.
+const BOARD = { x: 36, y: -86, w: 60, h: 54 };
+const CHALK = '#f4f7ef';
+
+function chalkRow(ctx, index) {
+  if (index === 2) {
+    ellipse(ctx, 0, 0, 4.2, 4.2, null, '#ffe45c', 1.5);
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      line(ctx, [P(Math.cos(a) * 6, Math.sin(a) * 6), P(Math.cos(a) * 8.5, Math.sin(a) * 8.5)], '#ffe45c', 1.3);
+    }
+    return;
+  }
+  ctx.fillStyle = index ? '#bfe9ff' : CHALK;
+  ctx.font = 'bold 13px "Comic Sans MS", "Chalkboard SE", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(index ? '1+1=2' : 'A B C', 0, 0);
+}
+
+const lesson = {
+  behind(ctx, j, { p, mirrored }, parts) {
+    parts.add('blackboard');
+    const grow = Math.min(1, p / 0.08);
+    const { x, y, w, h } = BOARD;
+    ctx.save();
+    ctx.translate(x + w / 2, 0);
+    ctx.scale(grow, grow);
+    ctx.translate(-x - w / 2, 0);
+    for (const [from, to] of [[x + 12, x + 4], [x + w - 12, x + w - 4]]) {
+      line(ctx, [P(from, y + h), P(to, 1)], INK, 5);
+      line(ctx, [P(from, y + h), P(to, 1)], '#a9713d', 3);
+    }
+    rrect(ctx, x, y, w, h, 3, '#b9824a');
+    rrect(ctx, x + 3.5, y + 3.5, w - 7, h - 7, 1.5, '#2f6b4f', INK, 1);
+    rrect(ctx, x - 2, y + h - 1, w + 4, 4, 1.5, '#8f5e30', INK, 0.9);
+    rrect(ctx, x + 10, y + h - 3, 8, 2.4, 1, CHALK, INK, 0.6);
+    LESSON.rows.forEach((at, index) => {
+      const k = Math.min(1, (p - at) / LESSON.writing);
+      if (k <= 0) return;
+      ctx.save();
+      ctx.translate(x + w / 2, y + 13 + index * 14.5);
+      if (mirrored) ctx.scale(-1, 1);
+      // la riga si scopre poco per volta, nel verso di lettura
+      ctx.beginPath();
+      ctx.rect(-w / 2 + 4, -10, (w - 8) * k, 20);
+      ctx.clip();
+      chalkRow(ctx, index);
+      ctx.restore();
+    });
+    ctx.restore();
+  },
+  over(ctx, j, { t, p }, parts) {
+    if (p < 0.12) return;
+    parts.add('pointer');
+    const hand = j.b.ha;
+    // prima la mostra in alto, poi indica la riga che sta spiegando
+    const target = j.row === undefined
+      ? P(hand.x + 9, hand.y - 24)
+      : P(BOARD.x + 9 + Math.sin(t * 4) * 2, BOARD.y + 13 + j.row * 14.5);
+    line(ctx, [hand, target], INK, 3.8);
+    line(ctx, [hand, target], '#e8b56a', 2);
+    ellipse(ctx, target.x, target.y, 1.8, 1.8, '#d8323c', INK, 0.7);
+  },
+};
 
 const calisthenics = (pose) => ({ behind: (ctx) => apparatus(ctx, pose) });
 
@@ -344,6 +506,9 @@ export const SUPER_ART = {
       }
     },
   },
+
+  cilindro: magicHat,
+  lezione: lesson,
 
   selfie: {
     over(ctx, j, { t }, parts) {

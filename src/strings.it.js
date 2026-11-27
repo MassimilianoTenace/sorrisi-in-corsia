@@ -91,6 +91,16 @@ export const S = {
       power: 'Selfie',
       description: 'Smartphone in mano e via con gli autoscatti.',
     },
+    martina: {
+      name: 'Martina',
+      power: 'Coniglio dal cilindro',
+      description: 'Tira fuori un cilindro, un colpo di bacchetta magica e... salta fuori un coniglietto!',
+    },
+    ida: {
+      name: 'Ida',
+      power: 'Lezione alla lavagna',
+      description: 'Bacchetta in mano e lavagna pronta: spiega ai bambini lettere, numeri e tante altre cose.',
+    },
   },
 
   help: [
@@ -195,6 +205,8 @@ export const S = {
     spider: 'Spider-Man!',
     rock: 'Rock and roll!',
     selfie: 'Selfie!',
+    cilindro: 'Magia del cilindro!',
+    lezione: 'Tutti a lezione!',
   },
 
   say: {
@@ -214,6 +226,12 @@ export const S = {
       baconForAll: 'Pancetta per tutti!',
       shakira: 'Sono Shakira!',
       burp: 'BUUURP!',
+      hatLook: 'Guardate nel cilindro...',
+      rabbit: 'Ecco il coniglietto!',
+      lesson: 'Oggi impariamo!',
+      abc: 'A, B, C...',
+      sum: 'Uno più uno fa due!',
+      clear: 'Tutto chiaro?',
     },
     songStart: ['Questa è per te...', 'Un, due, tre...', 'Ascolta qui!'],
     songDone: 'Che canzone!',

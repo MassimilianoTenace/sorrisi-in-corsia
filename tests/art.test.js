@@ -148,6 +148,12 @@ test('ogni superpotere mostra i propri oggetti al momento giusto', () => {
   expect('max', 'giocoleria', 0.5, ['balls']);
   expect('emmanuele', 'spider', 0.5, ['web']);
   expect('anna', 'selfie', 0.5, ['phone']);
+  expect('martina', 'cilindro', 0.05, [], ['topHat', 'wand', 'rabbit']);
+  expect('martina', 'cilindro', 0.18, ['topHat'], ['wand', 'rabbit']);
+  expect('martina', 'cilindro', 0.4, ['topHat', 'wand'], ['rabbit']);
+  expect('martina', 'cilindro', 0.8, ['topHat', 'wand', 'rabbit']);
+  expect('ida', 'lezione', 0.05, ['blackboard'], ['pointer']);
+  expect('ida', 'lezione', 0.5, ['blackboard', 'pointer']);
 });
 
 test('trasformazioni: artigli, trucco, abito, pugile, Spider-Man e rockstar', () => {

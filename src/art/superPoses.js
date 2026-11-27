@@ -20,6 +20,11 @@ function vanishingAct(d, { t, p }) {
   return figure(d, { a: [[-10, 3], [-14, -8]], b: [[10, 9], [17, 4]], tilt: -0.1 });
 }
 
+// Cilindro: dietro la schiena -> si mostra -> capovolto, tocchi di bacchetta -> coniglietto.
+export const HAT = { show: 0.1, flip: 0.24, rabbit: 0.56 };
+// Lezione: la lavagna compare, poi si scrive una riga alla volta (ABC, la somma, il sole).
+export const LESSON = { rows: [0.2, 0.44, 0.64], writing: 0.12 };
+
 export const SUPER_POSES = {
   // --- calisthenics ---
   verticale(d, { t }) {
@@ -258,6 +263,38 @@ export const SUPER_POSES = {
       }),
       aFront: true,
       expression: 'joy',
+    };
+  },
+
+  // Martina: il cilindro nella destra, la bacchetta nella sinistra
+  cilindro(d, { t, p }) {
+    if (p < HAT.show) return figure(d, { a: REST_A, b: [[5, 12], [-8, 15]] });
+    if (p < HAT.flip) return { ...figure(d, { a: [[-10, 5], [-17, -3]], b: [[9, 9], [18, 3]], tilt: 0.1 }), expression: 'happy' };
+    const held = [[9, 13], [19, 14]];
+    if (p < HAT.rabbit) {
+      const tap = Math.sin(t * 11) * 2.5;
+      // la punta della bacchetta batte sulla tesa
+      return { ...figure(d, { a: [[2, 11], [16, 2 + tap]], b: held, tilt: 0.1 }), aFront: true };
+    }
+    return figure(d, { a: [[-11, 1], [-15, -11 + Math.sin(t * 4) * 1.5]], b: held, tilt: -0.08 });
+  },
+
+  // Ida: indica la lavagna con la bacchetta e gesticola con l'altra mano
+  lezione(d, { t, p }) {
+    const talk = Math.sin(t * 5) * 3;
+    if (p < LESSON.rows[0]) return figure(d, { a: REST_A, b: [[10, 8], [15, -2]], tilt: 0.04 });
+    const row = LESSON.rows.filter((at) => p >= at).length - 1;
+    const asking = p >= 0.82;
+    const reach = [[10, -2], [11, 3], [12, 8]][row];
+    return {
+      ...figure(d, {
+        a: asking ? [[-10, 3], [-17, -5 + talk]] : [[-10, 9], [-15, 5 + talk]],
+        b: [[9, 8], [reach[0] + Math.sin(t * 9) * 0.8, reach[1]]],
+        tilt: asking ? -0.1 : 0.08 + Math.sin(t * 2.5) * 0.04,
+        neckX: asking ? -1 : 1,
+      }),
+      row,
+      expression: asking ? 'joy' : 'happy',
     };
   },
 

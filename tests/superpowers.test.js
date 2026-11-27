@@ -4,7 +4,7 @@ import { CONFIG } from '../src/config.js';
 import { CHARACTERS, getCharacter } from '../src/characters/index.js';
 import { superGain, nextMove } from '../src/game/superpower.js';
 import { moveData } from '../src/game/superMoves.js';
-import { VANISH } from '../src/art/superPoses.js';
+import { VANISH, HAT, LESSON } from '../src/art/superPoses.js';
 import { actionsFor } from '../src/ui/actionMenu.js';
 import { S } from '../src/strings.it.js';
 import { newGame, run, until, place } from './helpers.js';
@@ -67,8 +67,13 @@ test('le battute vengono dette al momento giusto', () => {
     legoSparisce: ['Lo vedete il LEGO?', "Ora non c'è più!"],
     shakira: ['Sono Shakira!'],
     rutto: ['BUUURP!'],
+    cilindro: ['Guardate nel cilindro...', 'Ecco il coniglietto!'],
+    lezione: ['Oggi impariamo!', 'A, B, C...', 'Uno più uno fa due!', 'Tutto chiaro?'],
   };
-  const owner = { pancettaSparisce: 'caterina', pancettaLancio: 'caterina', legoSparisce: 'mariapa', shakira: 'sabrina', rutto: 'marina' };
+  const owner = {
+    pancettaSparisce: 'caterina', pancettaLancio: 'caterina', legoSparisce: 'mariapa', shakira: 'sabrina', rutto: 'marina',
+    cilindro: 'martina', lezione: 'ida',
+  };
   for (const [move, lines] of Object.entries(expected)) {
     const { game } = inRoom(owner[move], move);
     game.superpower();
@@ -81,6 +86,12 @@ test('la magia premia solo dopo che l’oggetto è sparito', () => {
     assert.ok(moveData(move).applyAt > VANISH.gone, move);
     assert.ok(moveData(move).lines.at(-1).at >= VANISH.gone, move);
   }
+});
+
+test('il coniglietto e la lezione premiano solo a numero compiuto', () => {
+  assert.ok(moveData('cilindro').applyAt > HAT.rabbit + 0.1);
+  assert.ok(moveData('cilindro').lines.at(-1).at >= HAT.rabbit);
+  assert.ok(moveData('lezione').applyAt > LESSON.rows.at(-1) + LESSON.writing);
 });
 
 // Usa il superpotere più volte e ritorna le mosse nell'ordine in cui sono uscite.

@@ -8,7 +8,7 @@ import { S } from '../src/strings.it.js';
 
 const NAMES = [
   'Lorenzo', 'Gianni', 'Caterina', "Mariapa'", 'Marina', 'Sabrina', 'Mariafrancesca', 'Benedetta',
-  'Giovanna', 'Gabriella', 'Max', 'Vincenzo', 'Emmanuele', 'Mimmo', 'Anna',
+  'Giovanna', 'Gabriella', 'Max', 'Vincenzo', 'Emmanuele', 'Mimmo', 'Anna', 'Martina', 'Ida',
 ];
 
 test('ci sono tutti i volontari, senza doppioni', () => {
@@ -67,6 +67,8 @@ test('ogni volontario ha il superpotere richiesto', () => {
     emmanuele: ['spider'],
     mimmo: ['rock'],
     anna: ['selfie'],
+    martina: ['cilindro'],
+    ida: ['lezione'],
   });
 });
 

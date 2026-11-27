@@ -43,6 +43,8 @@ Tutti indossano la maglietta bianca con l'orsetto e girano con pompetta e pallon
 | Emmanuele | Spider-Man: tuta, ragnatele e acrobazie |
 | Mimmo | Rockstar con i capelli colorati |
 | Anna | Selfie con lo smartphone |
+| Martina | Tira fuori un cilindro e con la bacchetta magica fa uscire un coniglietto |
+| Ida | Con bacchetta e lavagna spiega cose ai bambini |
 
 ## Provarlo sul proprio computer
 

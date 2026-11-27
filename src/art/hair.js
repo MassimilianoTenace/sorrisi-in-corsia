@@ -76,6 +76,18 @@ const BACK = {
       [r * 1.15, 0], [r * 1.25, r * 0.65], [r * 1.05, r * 1.3], [r * 0.4, r * 1.55]], r * 0.34);
   },
   bob: (ctx, look, r) => mane(ctx, look.hair, r, { bottom: 1.12, width: 1.18 }),
+  // lunghi e scalati: due lunghezze, con le punte leggere in fuori
+  curtain(ctx, look, r) {
+    mane(ctx, look.hair, r, { bottom: 1.9, width: 1.16, wave: 0.1 });
+    for (const dir of [-1, 1]) {
+      blob(ctx, look.hair, () => {
+        ctx.moveTo(dir * r * 0.8, -r * 0.2);
+        ctx.quadraticCurveTo(dir * r * 1.25, r * 0.55, dir * r * 1.34, r * 1.05);
+        ctx.quadraticCurveTo(dir * r * 1.05, r * 0.95, dir * r * 0.8, r * 0.7);
+      });
+    }
+  },
+  swept: (ctx, look, r) => mane(ctx, look.hair, r, { bottom: 1.75, width: 1.1 }),
   curlyBob(ctx, look, r) {
     curls(ctx, look.hair, [[-r * 1.05, -r * 0.3], [-r * 1.15, r * 0.3], [-r * 0.9, r * 0.8], [r * 1.05, -r * 0.3],
       [r * 1.15, r * 0.3], [r * 0.9, r * 0.8]], r * 0.45);
@@ -182,6 +194,27 @@ const FRONT = {
   bob(ctx, look, r) {
     curtains(ctx, look.hair, r, { part: -0.35, length: 1.02 });
     line(ctx, [P(-r * 0.35, -r * 1.05), P(-r * 0.85, -r * 0.4)], shade(look.hair, 0.28), 1.2);
+  },
+  // frangia a tendina: si apre al centro e scende fino agli zigomi
+  curtain(ctx, look, r) {
+    curtains(ctx, look.hair, r, { part: 0.18, length: 1.2, bangs: 0.2 });
+    for (const [dir, x] of [[-1, 0.12], [1, 0.24]]) {
+      blob(ctx, look.hair, () => {
+        ctx.moveTo(r * 0.18, -r * 0.95);
+        ctx.quadraticCurveTo(r * (x + dir * 0.4), -r * 0.45, r * (x + dir * 0.82), r * 0.08);
+        ctx.quadraticCurveTo(r * (x + dir * 0.85), -r * 0.65, r * (x + dir * 0.45), -r * 0.98);
+      }, INK, 0.9);
+    }
+    line(ctx, [P(-r * 0.95, -r * 0.05), P(-r * 0.86, r * 0.55), P(-r * 1.02, r * 0.95)], look.highlights, 1.1);
+  },
+  // tirati indietro, con la riga di lato: fronte libera
+  swept(ctx, look, r) {
+    crop(ctx, look.hair, r, () => {
+      ctx.quadraticCurveTo(r * 0.9, -r * 0.5, r * 0.4, -r * 0.82);
+      ctx.bezierCurveTo(r * 0.05, -r * 0.55, -r * 0.65, -r * 0.55, -r * 0.76, r * 0.25);
+    });
+    line(ctx, [P(r * 0.4, -r * 0.88), P(r * 0.2, -r * 1.05)], look.highlights, 1);
+    line(ctx, [P(r * 0.1, -r * 0.9), P(-r * 0.55, -r * 0.75), P(-r * 0.9, -r * 0.15)], look.highlights, 1.1);
   },
   curlyBob(ctx, look, r) {
     curtains(ctx, look.hair, r, { part: -0.2, length: 0.75 });

@@ -33,6 +33,25 @@ export const SUPER_MOVES = {
   spider: { duration: 7, applyAt: 0.45, throws: 'web' },
   rock: { duration: 6.5, sound: 'strum' },
   selfie: { duration: 5.8, sound: 'camera' },
+  cilindro: {
+    duration: 7.5,
+    applyAt: 0.74, // il coniglietto è già uscito e i numeri non coprono subito la battuta
+    sound: 'magic',
+    lines: [
+      { at: 0.2, key: 'hatLook' },
+      { at: 0.62, key: 'rabbit' },
+    ],
+  },
+  lezione: {
+    duration: 10,
+    applyAt: 0.86,
+    lines: [
+      { at: 0.06, key: 'lesson' },
+      { at: 0.28, key: 'abc' },
+      { at: 0.5, key: 'sum' },
+      { at: 0.74, key: 'clear' },
+    ],
+  },
 };
 
 export const moveData = (id) => ({

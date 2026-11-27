@@ -294,6 +294,12 @@ function torso(ctx, d, look, hip, neck, back, parts) {
       ellipse(ctx, p.x, p.y, 0.95, 0.95, '#fffdf4', '#8d8478', 0.5);
     }
   }
+  if (!back && look.necklace === 'chain') {
+    // catenina sottile con un ciondolo, sopra la maglietta
+    line(ctx, [at(1.2, -3.4), at(5.8, 0.5), at(1.2, 4.4)], '#c99a2e', 0.9);
+    const p = at(6.4, 0.5);
+    ellipse(ctx, p.x, p.y, 1.2, 1.4, '#f2c14e', INK, 0.5);
+  }
   if (look.bumbag) {
     // marsupio in vita
     const p = at(len - 1, back ? -3 : 3);
@@ -519,6 +525,8 @@ export function drawCharacter(ctx, baseLook, opts = {}) {
   const superArt = SUPER_ART[pose];
   const env = { t, phase: opts.phase ?? 0, progress, p: progress };
   const j = (POSES[pose] ?? SUPER_POSES[pose])(d, env);
+  const mirrored = flip !== Boolean(j.mirror);
+  env.mirrored = mirrored; // le scritte vanno contro-specchiate per restare leggibili
   // capelli bianchi e arruffati (effetto di un superpotere)
   let look = opts.frizz ? { ...baseLook, style: 'frizz', hair: '#f4f3ee', roots: null, brow: baseLook.hair } : baseLook;
   if (superArt?.outfit) look = { ...look, ...superArt.outfit(look, env) };
@@ -534,7 +542,7 @@ export function drawCharacter(ctx, baseLook, opts = {}) {
   }
 
   ctx.save();
-  if (flip !== Boolean(j.mirror)) ctx.scale(-1, 1);
+  if (mirrored) ctx.scale(-1, 1);
 
   if (gear === 'balloons') {
     balloonBunch(ctx, j.hip, t);

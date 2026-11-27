@@ -183,6 +183,49 @@ const HAIR = {
       shine(ctx, look, [[58, 110], [64, 140], [54, 160]], [[144, 108], [136, 140], [146, 160]], [[94, 54], [74, 68], [68, 86]]);
     },
   },
+  curtain: {
+    back(ctx, look) {
+      mane(ctx, look.hair, { bottom: 206, spread: 56, wave: 5 });
+      // scalatura: ciocche che si aprono in fuori
+      for (const dir of [-1, 1]) {
+        shape(ctx, look.hair, () => {
+          ctx.moveTo(100 + dir * 44, 96);
+          ctx.quadraticCurveTo(100 + dir * 54, 128, 100 + dir * 64, 148);
+          ctx.quadraticCurveTo(100 + dir * 52, 150, 100 + dir * 42, 138);
+        });
+      }
+    },
+    front(ctx, look) {
+      curtains(ctx, look.hair, { part: 106, length: 158, fringe: -5 });
+      for (const dir of [-1, 1]) {
+        shape(ctx, look.hair, () => {
+          ctx.moveTo(106, 40);
+          ctx.bezierCurveTo(106 + dir * 8, 52, 100 + dir * 36, 52, 100 + dir * 43, 94);
+          ctx.bezierCurveTo(100 + dir * 48, 66, 100 + dir * 38, 44, 106 + dir * 14, 38);
+        }, INK, 1.6);
+      }
+      shine(ctx, look, [[96, 46], [76, 62], [64, 82]], [[118, 46], [134, 62], [142, 84]], [[58, 112], [60, 134], [48, 150]]);
+    },
+  },
+  swept: {
+    back: (ctx, look) => mane(ctx, look.hair, { bottom: 196, spread: 50 }),
+    front(ctx, look) {
+      crop(ctx, look.hair, () => {
+        ctx.bezierCurveTo(140, 62, 128, 50, 119, 49);
+        ctx.bezierCurveTo(100, 66, 64, 56, 59, 82);
+      });
+      // ciocche raccolte dietro le orecchie
+      for (const dir of [-1, 1]) {
+        shape(ctx, look.hair, () => {
+          ctx.moveTo(100 + dir * 41, 74);
+          ctx.quadraticCurveTo(100 + dir * 56, 100, 100 + dir * 45, 136);
+          ctx.quadraticCurveTo(100 + dir * 49, 104, 100 + dir * 39, 86);
+        }, INK, 1.6);
+      }
+      line(ctx, [P(119, 49), P(112, 34)], look.highlights, 2);
+      shine(ctx, look, [[110, 44], [86, 50], [66, 66]], [[104, 34], [78, 38], [60, 62]], [[126, 42], [140, 60]]);
+    },
+  },
   longCurly: {
     back(ctx, look) {
       mane(ctx, look.hair, { bottom: 186, spread: 60, wave: 8 });
@@ -376,6 +419,12 @@ function jewels(ctx, look) {
     ctx.quadraticCurveTo(101, 164, 121, 146);
     finish(ctx, null, '#17131c', 4);
     heart(ctx, 101, 164, 7, '#f2c14e');
+  } else if (necklace === 'chain') {
+    ctx.beginPath();
+    ctx.moveTo(81, 149);
+    ctx.quadraticCurveTo(101, 188, 121, 149);
+    finish(ctx, null, '#c99a2e', 2);
+    ellipse(ctx, 101, 169, 3.2, 3.8, '#f2c14e', INK, 1);
   }
 }
 
