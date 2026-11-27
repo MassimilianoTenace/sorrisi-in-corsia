@@ -61,7 +61,7 @@ Poi apri <http://localhost:8000>.
 1. Carica i file su GitHub (ramo `main`).
 2. Nel repository: **Settings → Pages → Build and deployment**.
 3. Source: **Deploy from a branch**, ramo `main`, cartella `/ (root)`, poi **Save**.
-4. Dopo un paio di minuti il gioco è su `https://massimilianotenace.github.io/ai-abio/`.
+4. Dopo un paio di minuti il gioco è su `https://massimilianotenace.github.io/sorrisi-in-corsia/`.
 
 Con un account GitHub gratuito il repository deve essere pubblico. Non c'è nessuna compilazione: i file vengono serviti così come sono.
 
