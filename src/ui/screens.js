@@ -1,13 +1,14 @@
 // Schermate sovrapposte: titolo, scelta del personaggio, aiuto e scaffale dei giochi.
 import { el } from './dom.js';
 import { S } from '../strings.it.js';
-import { CHARACTERS, LOCKED_SLOTS } from '../characters/index.js';
-import { drawPortrait, drawLockedPortrait } from '../art/portrait.js';
+import { CHARACTERS } from '../characters/index.js';
+import { drawPortrait } from '../art/portrait.js';
 import { icon, toyIcon } from '../art/icons.js';
 import { TOY_IDS } from '../art/props.js';
 
-export function createScreens(root, { onStart, onClick }) {
+export function createScreens(root, { onStart, onChange, onClick }) {
   let current = null;
+  let chosen = CHARACTERS[0].id; // la scelta resta tornando indietro
 
   const show = (name, node) => {
     current = name;
@@ -45,56 +46,67 @@ export function createScreens(root, { onStart, onClick }) {
         el('h1', {}, S.title),
         el('p', {}, S.subtitle),
         el('div', { class: 'row' },
-          button(S.play, select, { class: 'btn primary', 'data-autofocus': '' }),
+          button(S.play, () => select(), { class: 'btn primary', 'data-autofocus': '' }),
           button(S.howTo, () => help(title)),
         ),
       ),
     );
   }
 
-  function select() {
-    let chosen = CHARACTERS[0];
-    const cards = CHARACTERS.map((c) => {
-      const text = S.characters[c.id];
-      const canvas = el('canvas', { width: 360, height: 396, class: 'portrait' });
-      drawPortrait(canvas, c.portrait, { balloons: true });
-      const card = el('button', {
-        type: 'button',
-        class: 'card selected',
-        'aria-pressed': 'true',
-        onclick: () => {
-          chosen = c;
-          cards.forEach((other) => {
-            other.classList.toggle('selected', other === card);
-            other.setAttribute('aria-pressed', String(other === card));
-          });
-        },
-      },
-        canvas,
+  // Con "change" si cambia volontario a partita in corso; inWard sono i colleghi in reparto.
+  function select({ change = false, current = chosen, inWard = [] } = {}) {
+    let picked = current;
+    const detail = el('div', { class: 'detail', 'aria-live': 'polite' });
+    const describe = () => {
+      const text = S.characters[picked];
+      detail.replaceChildren(
         el('strong', {}, text.name),
         el('span', { class: 'power' }, icon('super', 20), `${S.superpowerLabel}: ${text.power}`),
         el('span', { class: 'desc' }, text.description),
       );
+    };
+    const cards = CHARACTERS.map((c) => {
+      const canvas = el('canvas', { width: 220, height: 242, class: 'portrait' });
+      drawPortrait(canvas, c, { gear: true });
+      const card = el('button', {
+        type: 'button',
+        class: `card${c.id === picked ? ' selected' : ''}`,
+        'aria-pressed': String(c.id === picked),
+        'data-character': c.id,
+        onclick: () => {
+          picked = c.id;
+          cards.forEach((other) => {
+            other.classList.toggle('selected', other === card);
+            other.setAttribute('aria-pressed', String(other === card));
+          });
+          describe();
+        },
+      },
+        canvas,
+        el('strong', {}, S.characters[c.id].name),
+        inWard.includes(c.id) && el('span', { class: 'badge' }, S.inWard),
+      );
       return card;
     });
-    const locked = Array.from({ length: LOCKED_SLOTS }, () => {
-      const canvas = el('canvas', { width: 360, height: 396, class: 'portrait' });
-      drawLockedPortrait(canvas);
-      return el('div', { class: 'card locked' }, canvas, el('strong', {}, S.comingSoon));
-    });
+    describe();
+    const confirm = () => {
+      chosen = picked;
+      hide();
+      if (change) onChange(picked);
+      else onStart(picked);
+    };
     show('select',
       el('div', { class: 'panel select-panel' },
-        el('h2', {}, S.chooseCharacter),
-        el('div', { class: 'cards' }, ...cards, ...locked),
+        el('h2', {}, change ? S.changeCharacter : S.chooseCharacter),
+        el('div', { class: 'cards' }, ...cards),
+        detail,
         el('div', { class: 'row' },
-          button(S.back, title),
-          button(S.start, () => {
-            hide();
-            onStart(chosen.id);
-          }, { class: 'btn primary', 'data-autofocus': '' }),
+          change ? button(S.cancel, hide) : button(S.back, title),
+          button(change ? S.confirmChange : S.start, confirm, { class: 'btn primary', 'data-autofocus': '' }),
         ),
       ),
     );
+    root.querySelector('.card.selected')?.scrollIntoView({ block: 'nearest' });
   }
 
   // back: funzione da richiamare alla chiusura (assente = si torna al gioco)
@@ -147,6 +159,7 @@ export function createScreens(root, { onStart, onClick }) {
 
   return {
     title,
+    select,
     help,
     shelf,
     hide,

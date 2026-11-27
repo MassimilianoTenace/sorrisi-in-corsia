@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createMap } from '../src/world/map.js';
-import { FURNITURE, BEDS, CHAIRS, AREAS, PLAY_SPOTS, PLAYER_START, RESERVED } from '../src/world/layout.js';
+import { FURNITURE, BEDS, CHAIRS, AREAS, PLAY_GROUPS, PLAYER_START, RESERVED } from '../src/world/layout.js';
 import { findPath } from '../src/engine/pathfinding.js';
 import { depthSort } from '../src/engine/depthSort.js';
 import { toScreen, toWorld } from '../src/engine/iso.js';
@@ -49,9 +49,11 @@ test('letti, sedie e scaffale sono raggiungibili dalla propria stanza', () => {
     const spots = map.tilesAround(item).filter((t) => map.areaAt(t.x, t.y) === area);
     assert.ok(spots.some(reachable), `${item.type} ${item.id} non raggiungibile`);
   }
-  for (const spot of PLAY_SPOTS) {
+  const spots = PLAY_GROUPS.flat();
+  assert.equal(new Set(spots.map((s) => `${s.x},${s.y}`)).size, spots.length, 'posti di gioco sovrapposti');
+  for (const spot of spots) {
     assert.equal(map.areaAt(spot.x, spot.y), 'giochi');
-    assert.ok(reachable(spot));
+    assert.ok(reachable(spot), `posto ${spot.x},${spot.y}`);
   }
 });
 

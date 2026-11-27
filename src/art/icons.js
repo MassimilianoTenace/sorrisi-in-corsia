@@ -1,6 +1,6 @@
 // Icone dei pulsanti, disegnate con lo stesso stile del gioco.
 import { INK, ellipse, line, rrect, poly, heart } from './primitives.js';
-import { drawToy, drawRoundBalloon, drawPump } from './props.js';
+import { drawToy, drawRoundBalloon, drawPump, drawGuitar } from './props.js';
 
 const P = (x, y) => ({ x, y });
 
@@ -12,6 +12,7 @@ const ICONS = {
     drawRoundBalloon(c, 11, 11, 9, '#ef4b4b');
     drawRoundBalloon(c, 22, 10, 8, '#3f8fe8');
   },
+  guitar: (c) => drawGuitar(c, 13, 20, 0.75, { s: 0.85 }),
   toy: (c) => drawToy(c, 'peluche', 16, 17, 1.5),
   invite(c) {
     for (const [x, color] of [[10, '#ffb12b'], [22, '#52bd5a']]) {

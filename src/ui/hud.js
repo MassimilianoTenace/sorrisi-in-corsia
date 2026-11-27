@@ -14,6 +14,13 @@ export function createHud({ panel, roomLabel, toasts }, actions) {
   const smiles = el('b', {});
   const balloons = el('b', {});
   const popped = el('b', {});
+  const balloonsLabel = el('span', {});
+  const poppedLabel = el('span', {});
+  const changeButton = el('button', { type: 'button', id: 'btn-change', class: 'group who', title: S.changeCharacter, onclick: actions.changeCharacter },
+    portrait,
+    name,
+    el('small', {}, S.actions.change),
+  );
   const toySlot = el('span', { class: 'slot' });
   const toyName = el('small', {});
   const cooldown = el('i', { class: 'cooldown' });
@@ -40,14 +47,14 @@ export function createHud({ panel, roomLabel, toasts }, actions) {
   );
 
   panel.replaceChildren(
-    el('div', { class: 'group who' }, portrait, name),
+    changeButton,
     el('div', { class: 'group stats' },
       el('div', { class: 'meter-label' }, S.hud.average, ' ', meterValue),
       el('div', { class: 'meter' }, meterFill),
       el('div', { class: 'counters' },
         el('span', {}, `${S.hud.smiles}: `, smiles),
-        el('span', {}, `${S.hud.balloons}: `, balloons),
-        el('span', { class: 'popped' }, popped, ` ${S.hud.popped}`),
+        el('span', {}, balloonsLabel, balloons),
+        el('span', { class: 'popped' }, popped, poppedLabel),
       ),
     ),
     el('div', { class: 'group tools' },
@@ -69,12 +76,23 @@ export function createHud({ panel, roomLabel, toasts }, actions) {
     return true;
   };
 
+  // Ritratto, nome e nomi dei contatori seguono il volontario scelto.
+  function setCharacter(game) {
+    const { character } = game.player;
+    last = {};
+    drawPortrait(portrait, character);
+    name.textContent = S.characters[character.id].name;
+    const guitar = character.gear === 'guitar';
+    balloonsLabel.textContent = `${guitar ? S.hud.songs : S.hud.balloons}: `;
+    poppedLabel.textContent = ` ${guitar ? S.hud.broken : S.hud.popped}`;
+  }
+
   return {
+    setCharacter,
+
     reset(game) {
-      last = {};
       toasts.replaceChildren();
-      drawPortrait(portrait, game.player.character.portrait);
-      name.textContent = S.characters[game.player.character.id].name;
+      setCharacter(game);
     },
 
     update(game) {
@@ -85,8 +103,11 @@ export function createHud({ panel, roomLabel, toasts }, actions) {
         meterValue.textContent = `${avg}%`;
       }
       if (changed('smiles', game.stats.smiles)) smiles.textContent = game.stats.smiles;
-      if (changed('balloons', game.stats.balloons)) balloons.textContent = game.stats.balloons;
-      if (changed('popped', game.stats.popped)) popped.textContent = game.stats.popped;
+      const guitar = game.player.character.gear === 'guitar';
+      const made = guitar ? game.stats.songs : game.stats.balloons;
+      const failed = guitar ? game.stats.broken : game.stats.popped;
+      if (changed('balloons', made)) balloons.textContent = made;
+      if (changed('popped', failed)) popped.textContent = failed;
 
       const carried = game.player.carried;
       if (changed('carried', carried ?? 'none')) {
@@ -103,6 +124,7 @@ export function createHud({ panel, roomLabel, toasts }, actions) {
         superButton.disabled = wait > 0 || busy;
         superButton.classList.toggle('ready', wait === 0 && !busy);
         toyButton.disabled = busy;
+        changeButton.disabled = busy;
       }
 
       const canPlay = !busy && game.readyToPlay().length > 0;

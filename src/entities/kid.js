@@ -14,6 +14,8 @@ export class Kid extends Walker {
     this.toy = null;
     this.reaction = null; // espressione momentanea
     this.cheer = 0;
+    this.frizz = 0; // secondi residui con i capelli bianchi
+    this.leader = null; // il volontario che sta seguendo
     this.repath = 0;
   }
 
@@ -32,6 +34,7 @@ export class Kid extends Walker {
       .filter((t) => map.areaAt(t.x, t.y) === this.bed.room)
       .sort((a, b) => Math.abs(a.y - this.bed.y) - Math.abs(b.y - this.bed.y));
     this.state = 'returning';
+    this.leader = null;
     if (!spots.length || !this.walkTo(map, spots[0].x, spots[0].y)) this.layDown();
   }
 
@@ -41,6 +44,7 @@ export class Kid extends Walker {
     this.y = p.y;
     this.stop();
     this.state = 'bed';
+    this.leader = null;
     this.back = false;
     this.flip = false;
   }

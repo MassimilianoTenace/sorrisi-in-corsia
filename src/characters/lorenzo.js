@@ -1,19 +1,11 @@
-export default {
+import { volunteer } from './volunteer.js';
+
+export default volunteer({
   id: 'lorenzo',
-  portrait: 'lorenzo',
   look: {
-    skin: '#e5ac81',
-    hair: '#241715',
-    style: 'quiff',
-    beard: '#33211b',
-    top: '#f7cfd3',
-    topStyle: 'shirt',
-    bottom: '#362825',
-    shoes: '#241a17',
-    belt: true,
-    seed: 1.7,
+    skin: '#e2a77d', hair: '#1f1412', style: 'quiff', beard: '#2f1f19', beardStyle: 'short', thickBrows: true,
+    bottom: '#362825', shoes: '#241a17', belt: true, seed: 1.7,
   },
-  superpower: {
-    moves: ['verticale', 'planche', 'lsit', 'bandiera'],
-  },
-};
+  portrait: { face: 'square', eyes: '#4a2c1c', smile: 'soft' },
+  moves: ['verticale', 'planche', 'lsit', 'bandiera'],
+});

@@ -4,6 +4,7 @@ import { CONFIG } from '../src/config.js';
 import { changeHappiness, decayed, happinessHue, expressionFor } from '../src/game/happiness.js';
 import { resolveBalloon } from '../src/game/balloon.js';
 import { superGain } from '../src/game/superpower.js';
+import { CHARACTERS } from '../src/characters/index.js';
 import { newGame, run, until, place, seeded } from './helpers.js';
 
 const setAll = (game, value) => game.kids.forEach((k) => (k.happiness = value));
@@ -186,7 +187,7 @@ test('non più di tre bambini al seguito; si possono rimandare a letto', () => {
 
 test('partita lunga e caotica: nessun errore e valori sempre validi', () => {
   for (let seed = 1; seed <= 6; seed++) {
-    const { game } = newGame(seed);
+    const { game } = newGame(seed, 'lorenzo', 2); // con i colleghi e qualche cambio di volontario
     const rng = seeded(seed * 101);
     const types = ['approach', 'balloon', 'toy', 'invite', 'sendBack'];
     for (let step = 0; step < 24000; step++) {
@@ -199,6 +200,7 @@ test('partita lunga e caotica: nessun errore e valori sempre validi', () => {
         else if (roll < 0.7) game.openShelf();
         else if (roll < 0.76) game.takeToy(game.shelf.list()[0]);
         else if (roll < 0.9) game.playTogether();
+        else if (roll < 0.93) game.changeCharacter(CHARACTERS[Math.floor(rng() * CHARACTERS.length)].id);
       }
       game.update(0.05);
       for (const k of game.kids) {
@@ -206,10 +208,14 @@ test('partita lunga e caotica: nessun errore e valori sempre validi', () => {
         assert.ok(game.map.areaAt(k.x, k.y), `${k.id} fuori mappa`);
         if (k.state !== 'bed') assert.ok(game.map.isWalkable(k.tile.x, k.tile.y), `${k.id} dentro un mobile`);
       }
-      assert.ok(game.map.isWalkable(game.player.tile.x, game.player.tile.y), 'volontario dentro un mobile');
+      for (const v of game.volunteers) {
+        assert.ok(game.map.isWalkable(v.tile.x, v.tile.y), `${v.character.id} dentro un mobile`);
+      }
+      assert.equal(new Set(game.volunteers.map((v) => v.character.id)).size, 3, 'volontari doppi');
+      for (const k of game.kids) assert.equal(k.state === 'following' && !k.leader, false, `${k.id} segue nessuno`);
     }
     // nessun gioco perso per strada
-    const out = game.kids.filter((k) => k.toy).map((k) => k.toy.id).concat(game.player.carried ?? []);
+    const out = game.kids.filter((k) => k.toy).map((k) => k.toy.id).concat(game.volunteers.flatMap((v) => v.carried ?? []));
     assert.equal(new Set(out).size, out.length);
     assert.equal(game.shelf.available.size + out.length, 6);
   }

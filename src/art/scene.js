@@ -4,23 +4,25 @@ import { depthSort } from '../engine/depthSort.js';
 import { drawFloor, drawDoorMats, wallItems } from './tiles.js';
 import { drawFurniture } from './furniture.js';
 import { drawCharacter } from './characterRig.js';
-import { drawToy, drawBalloonShape } from './props.js';
+import { drawToy, drawBalloonShape, drawBacon, drawWeb, drawNote } from './props.js';
 import { INK, ellipse, rrect, shadow, star, heart, poly } from './primitives.js';
 import { happinessColor } from '../game/happiness.js';
 import { SpriteCache } from './spriteCache.js';
+import { S } from '../strings.it.js';
 
 // Arredi animati; gli altri si dipingono una volta sola (letti e sedie cambiano con chi li occupa).
 const ANIMATED = new Set(['tv', 'monitor', 'vending', 'fishtank', 'rocket', 'rockinghorse', 'toyshelf', 'piano']);
 const FPS = 12;
 const CHARACTER_BOX = { x: -70, y: -115, w: 140, h: 135 };
-const STAGE_BOX = { x: -90, y: -150, w: 180, h: 175 };
+// durante i superpoteri serve più spazio per gli effetti; il personaggio non cambia misura
+const SUPER_BOX = { x: -105, y: -165, w: 210, h: 190 };
 
 // Numero del fotogramma; lo sfasamento distribuisce il lavoro tra gli oggetti.
 const frameOf = (t, offset) => Math.floor(t * FPS + offset);
 
 // Tutto ciò che cambia l'aspetto di un personaggio.
 const signature = (o, offset) =>
-  [frameOf(o.t, offset), o.pose, o.back, o.flip, o.expression, o.toy, o.balloon?.shape, o.balloon?.color, o.making?.shape].join();
+  [frameOf(o.t, offset), o.pose, o.back, o.flip, o.expression, o.toy, o.balloon?.shape, o.balloon?.color, o.making?.shape, o.gear, o.frizz].join();
 
 // Rettangolo di schermo che contiene tutto un oggetto, a partire dal suo ingombro.
 function screenBox({ x0, y0, x1, y1 }) {
@@ -39,19 +41,21 @@ function kidOptions(game, kid) {
     expression: kid.expression,
     balloon: kid.balloon,
     toy: kid.toy?.id,
+    frizz: kid.frizz > 0,
   };
-  const cheering = kid.cheer > 0 || (game.player.action?.type === 'super' && game.player.action.audience.includes(kid) && game.player.action.applied);
+  const cheering =
+    kid.cheer > 0 ||
+    game.volunteers.some(({ action }) => action?.type === 'super' && action.applied && action.audience.includes(kid));
   if (kid.state === 'bed') return { ...opts, pose: cheering ? 'bedCheer' : 'bed' };
   const pose = kid.moving ? 'walk' : cheering || kid.state === 'playing' ? 'cheer' : 'stand';
   return { ...opts, pose, phase: kid.phase, back: kid.back, flip: kid.flip };
 }
 
-function playerOptions(game) {
-  const p = game.player;
+function volunteerOptions(game, p) {
   const a = p.action;
   const opts = {
     t: game.time,
-    gear: true,
+    gear: p.character.gear,
     toy: p.carried,
     back: p.back,
     flip: p.flip,
@@ -60,12 +64,13 @@ function playerOptions(game) {
     expression: 'happy',
   };
   if (a?.type === 'balloon') {
+    if (a.song) return { ...opts, pose: 'strum', back: false, toy: null, expression: 'joy' };
     return { ...opts, pose: 'pump', back: false, toy: null, progress: a.t / a.duration, making: { shape: a.shape, color: a.color } };
   }
   if (a?.type === 'super') {
     // breve slancio prima di entrare nella posa
     const pose = a.t < 0.35 || a.t > a.duration - 0.35 ? 'cheer' : a.move;
-    return { ...opts, pose, back: false, toy: null, expression: 'joy' };
+    return { ...opts, pose, back: false, toy: null, expression: 'joy', progress: a.t / a.duration };
   }
   if (a?.type === 'giving') return { ...opts, toy: a.toyId, expression: 'joy' };
   if (a?.type === 'playing' && !p.moving) return { ...opts, pose: 'cheer', back: false, expression: 'joy' };
@@ -142,12 +147,9 @@ export class Scene {
     const person = (key, who, look, opts, offset, stage = false) =>
       walker(who, (ctx) => {
         const anchor = toScreen(who.x, who.y);
-        shadow(ctx, anchor.x, anchor.y, stage ? 36 : look.kid ? 11 : 15);
-        const paint = (g) => {
-          if (stage) g.scale(1.35, 1.35); // le acrobazie si vedono un po' più in grande
-          drawCharacter(g, look, opts);
-        };
-        this.cache.draw(ctx, key, stage ? STAGE_BOX : CHARACTER_BOX, paint, { version: signature(opts, offset), anchor });
+        shadow(ctx, anchor.x, anchor.y, look.kid ? 11 : 15);
+        const paint = (g) => drawCharacter(g, look, opts);
+        this.cache.draw(ctx, key, stage ? SUPER_BOX : CHARACTER_BOX, paint, { version: signature(opts, offset), anchor });
       });
 
     game.kids.forEach((kid, i) => {
@@ -158,8 +160,10 @@ export class Scene {
       const opts = { pose: a.moving ? 'walk' : 'stand', t: t + a.x * (a.moving ? 0 : 1), phase: a.phase, back: a.back, flip: a.flip };
       person(a.id, a, a.look, opts, i * 0.43);
     });
-    const hero = game.player;
-    person('player', hero, hero.character.look, playerOptions(game), 0, hero.action?.type === 'super');
+    game.volunteers.forEach((v, i) => {
+      const key = v === game.player ? 'player' : `colleague${i}`;
+      person(key, v, v.character.look, volunteerOptions(game, v), i * 0.37, v.action?.type === 'super');
+    });
     return out;
   }
 
@@ -229,6 +233,9 @@ export class Scene {
       ctx.globalAlpha = Math.max(0, 1 - (p.t / p.life) ** 2);
       ctx.translate(s.x, s.y);
       if (p.kind === 'heart') heart(ctx, 0, 0, 5, p.color);
+      else if (p.kind === 'note') drawNote(ctx, 0, 0, 0.9, p.color);
+      else if (p.kind === 'bacon') drawBacon(ctx, 0, 0, p.spin + p.t * 9, 0.9);
+      else if (p.kind === 'web') drawWeb(ctx, 0, 0, 4 + p.t * 9);
       else {
         ctx.rotate(p.spin + p.t * 9);
         if (p.kind === 'shard') poly(ctx, [{ x: -5, y: -2 }, { x: 4, y: -4 }, { x: 1, y: 4 }], p.color, INK, 0.8);
@@ -241,8 +248,6 @@ export class Scene {
   // Barre della felicità, pensieri, fumetti e numeri: disegnati in pixel schermo.
   labels(ctx, game, camera) {
     const s = Math.min(1.6, Math.max(0.85, camera.zoom));
-    const action = game.player.action;
-
     for (const kid of game.kids) {
       const p = camera.worldToView(kid.x, kid.y, headTop(kid));
       this.happinessBar(ctx, p.x, p.y, s, kid.happiness, game.selected === kid.id);
@@ -252,18 +257,32 @@ export class Scene {
       if (wishing) this.thought(ctx, p.x + 25 * s, p.y - 13 * s, s, kid.favourite, game.player.carried === kid.favourite);
     }
 
-    if (action?.type === 'balloon') {
-      const p = camera.worldToView(game.player.x, game.player.y, 96);
+    // nomi dei colleghi e segnalino sopra il proprio volontario
+    for (const colleague of game.colleagues) {
+      const p = camera.worldToView(colleague.x, colleague.y, -4);
+      this.nameTag(ctx, p.x, p.y, s, S.characters[colleague.character.id].name);
+    }
+    const hero = game.player;
+    if (hero.action?.type !== 'super' && !hero.bubble) {
+      const p = camera.worldToView(hero.x, hero.y, 98 + Math.sin(game.time * 4) * 3);
+      poly(ctx, [{ x: p.x - 8 * s, y: p.y - 9 * s }, { x: p.x + 8 * s, y: p.y - 9 * s }, { x: p.x, y: p.y + 2 * s }], '#7ee04f', INK, 1.8);
+    }
+
+    for (const who of game.volunteers) {
+      const { action } = who;
+      if (action?.type !== 'balloon') continue;
+      const p = camera.worldToView(who.x, who.y, 96);
       const k = action.t / action.duration;
       rrect(ctx, p.x - 26 * s, p.y - 4 * s, 52 * s, 8 * s, 4 * s, '#fff', INK, 1.5);
       rrect(ctx, p.x - 24 * s, p.y - 2 * s, Math.max(2, 48 * s * k), 4 * s, 2 * s, action.color, null);
-      drawBalloonShape(ctx, action.shape, p.x + 38 * s, p.y, 0.55 * s, action.color);
+      if (action.song) drawNote(ctx, p.x + 38 * s, p.y, 1.3 * s, action.color);
+      else drawBalloonShape(ctx, action.shape, p.x + 38 * s, p.y, 0.55 * s, action.color);
     }
 
-    const speaking = [game.player, ...game.kids, ...game.adults].filter((w) => w.bubble);
+    const speaking = [...game.volunteers, ...game.kids, ...game.adults].filter((w) => w.bubble);
     for (const who of speaking) {
       let z = 98;
-      if (who === game.player) z = 112;
+      if (who.character) z = 112;
       else if (who.look.kid) z = headTop(who) + 10;
       else if (who.state === 'sit') z = 76;
       const p = camera.worldToView(who.x, who.y, z);
@@ -287,6 +306,17 @@ export class Scene {
       ctx.fillText(f.text, p.x, p.y);
       ctx.restore();
     }
+  }
+
+  nameTag(ctx, x, y, s, name) {
+    ctx.font = `bold ${Math.round(11 * s)}px "Trebuchet MS", sans-serif`;
+    const w = ctx.measureText(name).width + 12 * s;
+    rrect(ctx, x - w / 2, y, w, 16 * s, 8 * s, 'rgba(255, 247, 227, 0.92)', INK, 1.2);
+    ctx.fillStyle = INK;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(name, x, y + 8.5 * s);
+    ctx.textBaseline = 'alphabetic';
   }
 
   happinessBar(ctx, x, y, s, value, selected) {
@@ -350,6 +380,8 @@ export class Scene {
       game.kids.filter((k) => (k.state === 'bed' ? hitsSprite(k, 16, 62, 18) : hitsSprite(k, 0, 72, 17))),
     );
     if (kid) return { type: 'kid', kid };
+    const who = front(game.colleagues.filter((c) => hitsSprite(c, 0, 82, 16)));
+    if (who) return { type: 'colleague', who };
     const adult = front(game.adults.filter((a) => hitsSprite(a, 0, a.state === 'sit' ? 66 : 82, 16)));
     if (adult) return { type: 'adult', adult };
     const sleeper = game.kids.find((k) => k.state === 'bed' && hitsVolume(k.bed, 28));

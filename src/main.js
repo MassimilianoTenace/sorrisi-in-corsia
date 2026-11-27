@@ -86,6 +86,15 @@ const controls = {
     click();
     screens.help();
   },
+  changeCharacter: () => {
+    if (game.player.busy) return;
+    click();
+    screens.select({
+      change: true,
+      current: game.player.character.id,
+      inWard: game.colleagues.map((c) => c.character.id),
+    });
+  },
   toggleSound: () => {
     audio.unlock();
     hud.setMuted(audio.toggle());
@@ -96,6 +105,12 @@ const controls = {
 const hud = createHud({ panel, roomLabel: $('room'), toasts: $('toasts') }, controls);
 const screens = createScreens($('screens'), {
   onClick: click,
+  onChange(characterId) {
+    if (!game.changeCharacter(characterId)) return;
+    hud.setCharacter(game);
+    hud.toast(S.toast.changed(S.characters[characterId].name));
+    follow();
+  },
   onStart(characterId) {
     playing = true;
     document.body.classList.add('playing');
@@ -122,6 +137,8 @@ attachInput(canvas, {
       audio.play('click');
       follow();
       if (!game.interact('approach', hit.kid.id)) game.selected = hit.kid.id;
+    } else if (hit.type === 'colleague') {
+      if (!hit.who.busy) hit.who.say(game.line(S.say.volunteerGreet), 2);
     } else if (hit.type === 'adult') {
       hit.adult.chat();
     } else if (hit.type === 'shelf') {
@@ -167,6 +184,7 @@ window.addEventListener('keydown', (e) => {
     e.preventDefault();
     controls.superpower();
   } else if (key === 'c') controls.center();
+  else if (key === 'p') controls.changeCharacter();
   else if (key === 'm') controls.toggleSound();
   else if (key === 'h' || key === '?') controls.help();
   else if (key === 'escape') game.selected = null;

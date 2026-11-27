@@ -19,9 +19,10 @@ export const CONFIG = {
     keepSeconds: 60,
   },
   superpower: {
-    duration: 4.5,
+    duration: 4.5, // durata normale; le mosse più lunghe sono in game/superMoves.js
     cooldown: 20,
     multiplier: 2, // guadagno = balloon.gain x multiplier, per ogni bambino nella stanza
+    whiteHairSeconds: 10, // quanto restano bianchi e arruffati i capelli (superpotere di Marina)
   },
   toys: {
     giveDuration: 2.6,
@@ -34,8 +35,18 @@ export const CONFIG = {
     gain: 30,
     maxFollowers: 3,
   },
+  colleagues: {
+    count: 2, // volontari che girano da soli
+    pause: [10, 20], // secondi di riposo tra un'attività e l'altra
+    firstPause: [1, 6],
+    superCooldown: 75, // ricarica del loro superpotere
+    firstSuper: [20, 50],
+    activityTimeout: 60, // un'attività più lunga viene interrotta
+    weights: { greet: 2, balloon: 4, gift: 3, playdate: 2, superpower: 3 }, // quanto spesso scelgono cosa
+  },
   speed: {
     player: 3.4, // caselle al secondo
+    colleague: 3,
     kid: 3.1,
     adult: 1.7,
   },

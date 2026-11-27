@@ -150,6 +150,13 @@ export const PLAY_SPOTS = [
   { x: 16, y: 10 },
 ];
 
+// Più volontari possono giocare insieme: ognuno con il proprio gruppo di posti.
+export const PLAY_GROUPS = [
+  PLAY_SPOTS,
+  [{ x: 16, y: 5 }, { x: 15, y: 4 }, { x: 17, y: 5 }, { x: 18, y: 5 }],
+  [{ x: 17, y: 12 }, { x: 16, y: 12 }, { x: 17, y: 11 }, { x: 15, y: 11 }],
+];
+
 // Caselle occupate da personale fermo.
 export const RESERVED = [
   { x: 6, y: 6 },

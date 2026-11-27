@@ -1,4 +1,4 @@
-// Oggetti piccoli: giochi, palloncini e pompetta.
+// Oggetti piccoli: giochi, palloncini, pompetta, chitarra e simili.
 import { INK, shade, poly, ellipse, rrect, line, heart } from './primitives.js';
 
 export const TOY_IDS = ['peluche', 'libro', 'costruzioni', 'pennarelli', 'marionetta', 'macchinina'];
@@ -128,4 +128,82 @@ export function drawPump(ctx, x, y, angle = 0, push = 0) {
   rrect(ctx, -4.4, -10.5, 8.8, 3.4, 1.2, '#2d5fb8');
   rrect(ctx, -1.8, 8.5, 3.6, 4, 1, '#2d5fb8');
   ctx.restore();
+}
+
+// Chitarra: (x, y) è il centro della cassa, il manico punta in alto prima della rotazione.
+export function drawGuitar(ctx, x, y, angle = 0, { electric = false, s = 1 } = {}) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  ctx.scale(s, s);
+  rrect(ctx, -1.9, -27, 3.8, 22, 1, '#6a4126', INK, 0.9);
+  rrect(ctx, -3, -33, 6, 7.5, 1.5, electric ? '#2b2530' : '#8a5a34', INK, 0.9);
+  for (const ky of [-31, -28]) {
+    ellipse(ctx, -3.6, ky, 1, 1, '#d9dde3', INK, 0.5);
+    ellipse(ctx, 3.6, ky, 1, 1, '#d9dde3', INK, 0.5);
+  }
+  if (electric) {
+    poly(ctx, [
+      { x: -8, y: -9 }, { x: -3, y: -4 }, { x: 4, y: -7 }, { x: 7, y: -11 }, { x: 7.5, y: -1 },
+      { x: 11, y: 10 }, { x: 3, y: 7 }, { x: -8, y: 13 }, { x: -6, y: 2 },
+    ], '#e0263c', INK, 1.2);
+    poly(ctx, [{ x: -3, y: -2 }, { x: 4, y: -2 }, { x: 5, y: 6 }, { x: -4, y: 7 }], '#f7f4ee', INK, 0.7);
+    for (const py of [0, 3.5]) rrect(ctx, -3, py - 1, 6, 1.8, 0.5, '#8d949c', null);
+  } else {
+    ellipse(ctx, 0, -2.5, 6.6, 6, '#d98c3f');
+    ellipse(ctx, 0, 6, 9, 8, '#d98c3f');
+    ellipse(ctx, 0, -2.5, 5.4, 4.6, '#e9a455', null);
+    ellipse(ctx, 0, 6, 7.4, 6.4, '#e9a455', null);
+    ellipse(ctx, 0, 0.6, 3, 3, '#3a2417', INK, 0.8);
+    rrect(ctx, -3.5, 7.4, 7, 2.2, 0.8, '#4a2c1a', null);
+  }
+  for (const sx of [-0.8, 0.8]) line(ctx, [{ x: sx, y: -27 }, { x: sx, y: 8 }], '#f3ead2', 0.45);
+  ctx.restore();
+}
+
+export function drawNote(ctx, x, y, s = 1, color = '#3f5fd0') {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(s, s);
+  line(ctx, [{ x: 2.2, y: 3 }, { x: 2.2, y: -7 }, { x: 6.5, y: -4.5 }], INK, 2.6);
+  line(ctx, [{ x: 2.2, y: 3 }, { x: 2.2, y: -7 }, { x: 6.5, y: -4.5 }], color, 1.2);
+  ellipse(ctx, -0.5, 3.4, 3.3, 2.5, color, INK, 0.9, -0.35);
+  ctx.restore();
+}
+
+// Fettina di pancetta ondulata a strisce.
+export function drawBacon(ctx, x, y, angle = 0, s = 1) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  ctx.scale(s, s);
+  const wave = (dy) => [-9, -4.5, 0, 4.5, 9].map((wx, i) => ({ x: wx, y: (i % 2 ? -1.6 : 1.2) + dy }));
+  poly(ctx, [...wave(-3), ...wave(3).reverse()], '#c9453c', INK, 1);
+  line(ctx, wave(-1.2), '#f6d3bd', 1.5);
+  line(ctx, wave(1.4), '#eda794', 1);
+  ctx.restore();
+}
+
+export function drawBrick(ctx, x, y, s = 1, color = '#e0262e') {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(s, s);
+  for (const bx of [-5.6, 1.4]) rrect(ctx, bx, -7.5, 4.2, 3.5, 1, shade(color, 0.12), INK, 0.9);
+  rrect(ctx, -7.5, -5, 15, 10, 1, color);
+  rrect(ctx, -6, -3.5, 12, 2, 0.8, shade(color, 0.28), null);
+  ctx.restore();
+}
+
+export function drawWeb(ctx, x, y, r, color = '#ffffff') {
+  const spokes = Array.from({ length: 8 }, (_, i) => (i * Math.PI) / 4 + 0.2);
+  const at = (a, k) => ({ x: x + Math.cos(a) * r * k, y: y + Math.sin(a) * r * k });
+  for (const k of [0.45, 0.85]) {
+    const ring = [...spokes, spokes[0]].map((a) => at(a, k));
+    line(ctx, ring, INK, 2.2);
+    line(ctx, ring, color, 1);
+  }
+  for (const a of spokes) {
+    line(ctx, [{ x, y }, at(a, 1)], INK, 2.2);
+    line(ctx, [{ x, y }, at(a, 1)], color, 1);
+  }
 }

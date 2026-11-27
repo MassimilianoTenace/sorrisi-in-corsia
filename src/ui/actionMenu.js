@@ -7,8 +7,20 @@ import { happinessColor, moodIndex } from '../game/happiness.js';
 export function actionsFor(game, kid) {
   const carried = game.player.carried;
   const following = kid.state === 'following';
+  const withColleague = following && kid.leader !== game.player;
+  const thirdAction = () => {
+    if (withColleague) {
+      const name = S.characters[kid.leader.character.id].name;
+      return { id: 'invite', key: 3, icon: 'invite', label: S.actions.follows(name), enabled: false };
+    }
+    return following
+      ? { id: 'sendBack', key: 3, icon: 'back', label: S.actions.sendBack, enabled: true }
+      : { id: 'invite', key: 3, icon: 'invite', label: S.actions.invite, enabled: true };
+  };
   return [
-    { id: 'balloon', key: 1, icon: 'balloon', label: S.actions.balloon, enabled: true },
+    game.player.character.gear === 'guitar'
+      ? { id: 'balloon', key: 1, icon: 'guitar', label: S.actions.song, enabled: true }
+      : { id: 'balloon', key: 1, icon: 'balloon', label: S.actions.balloon, enabled: true },
     {
       id: carried ? 'toy' : 'shelf',
       key: 2,
@@ -17,9 +29,7 @@ export function actionsFor(game, kid) {
       label: carried ? S.actions.toy : S.actions.toyNone,
       enabled: !carried || !kid.toy,
     },
-    following
-      ? { id: 'sendBack', key: 3, icon: 'back', label: S.actions.sendBack, enabled: true }
-      : { id: 'invite', key: 3, icon: 'invite', label: S.actions.invite, enabled: true },
+    thirdAction(),
   ];
 }
 
@@ -63,7 +73,7 @@ export function createActionMenu(root, { onAction, onClose }) {
         return;
       }
       const list = actionsFor(game, kid);
-      const next = `${kid.id}|${list.map((a) => `${a.id}${a.enabled}${a.toy ?? ''}`).join()}`;
+      const next = `${kid.id}|${list.map((a) => `${a.id}${a.enabled}${a.toy ?? ''}${a.label}`).join()}`;
       if (next !== signature) {
         signature = next;
         build(game, kid, list);

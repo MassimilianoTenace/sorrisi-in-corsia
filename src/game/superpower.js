@@ -9,7 +9,5 @@ export const superAudience = (map, origin, kids) => {
   return kids.filter((k) => map.areaAt(k.x, k.y) === area);
 };
 
-export function pickMove(moves, previous, rng = Math.random) {
-  const options = moves.filter((m) => m !== previous);
-  return options[Math.floor(rng() * options.length)] ?? moves[0];
-}
+// Le mosse si susseguono nell'ordine della lista; turn conta le volte già usate.
+export const nextMove = (moves, turn) => moves[turn % moves.length];
